@@ -39,15 +39,16 @@ const seedUsers = async (db: any, count: number = 10): Promise<void> => {
       const walletIdResult = await db.query(WalletQueries.findByUserId, [userId]);
       const walletId = walletIdResult.rows[0].id;
       
-      // Create initial wallet transaction for the deposit
-      await db.query(WalletQueries.createTransaction, [walletId, 'deposit', initialBalance, 'Initial promotional deposit']);
+      // Create initial wallet transaction for the deposit (use 0 as reference_id for seed/promo)
+      await db.query(WalletQueries.createTransaction, [walletId, 'deposit', initialBalance, 0, 'Initial promotional deposit']);
       
       seededCount++;
     } catch (err) {
-      console.error(`Error specifically seeding user ${username}:`, err);
+      console.error(`Error specifically seeding user ${username}:`, err instanceof Error ? err.message : err);
+      // Optional: don't exit loop, try next user
     }
   }
-  
+
   // Also make sure the 'admin' user created by migrations has a wallet
   try {
     const adminUser = await db.query(UserQueries.findByUsername, ['admin']);
@@ -63,7 +64,7 @@ const seedUsers = async (db: any, count: number = 10): Promise<void> => {
       }
     }
   } catch (err) {
-    console.error('Failed processing admin wallet:', err);
+    console.error('Failed processing admin wallet:', err instanceof Error ? err.message : err);
   }
   
   console.log(`✅ ${seededCount} users seeded with wallets`);

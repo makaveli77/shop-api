@@ -24,6 +24,25 @@ const swaggerOptions: swaggerJsdoc.Options = {
         },
       },
       schemas: {
+        Category: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            description: { type: 'string' }
+          }
+        },
+        Supplier: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            company_name: { type: 'string' },
+            contact_name: { type: 'string' },
+            email: { type: 'string' },
+            phone: { type: 'string' },
+            active: { type: 'boolean' }
+          }
+        },
         GenericError: {
           type: 'object',
           properties: {
@@ -60,6 +79,18 @@ const swaggerOptions: swaggerJsdoc.Options = {
             first_name: { type: 'string' },
             last_name: { type: 'string' },
             is_locked: { type: 'boolean' }
+          }
+        },
+        UserUpdate: {
+          type: 'object',
+          properties: {
+            first_name: { type: 'string' },
+            last_name: { type: 'string' },
+            address: { type: 'string' },
+            phone_number: { type: 'string' },
+            date_of_birth: { type: 'string', format: 'date' },
+            city: { type: 'string' },
+            country_code: { type: 'string' }
           }
         },
         UserStats: {
