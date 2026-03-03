@@ -45,6 +45,8 @@ const AuthController = {
    *                   description: JWT Bearer token
    *       401:
    *         description: Invalid credentials
+   *       403:
+   *         description: Account is locked
    *         content:
    *           application/json:
    *             schema:
@@ -52,7 +54,7 @@ const AuthController = {
    *               properties:
    *                 error:
    *                   type: string
-   *                   example: Invalid credentials
+   *                   example: Account is locked. Please contact support.
    */
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

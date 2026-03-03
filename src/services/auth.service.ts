@@ -23,6 +23,12 @@ const AuthService = {
       throw error;
     }
 
+    if (foundUser.is_locked) {
+      const error: CustomError = new Error('Account is locked. Please contact support.');
+      error.status = 403;
+      throw error;
+    }
+
     // Compare password
     const isPasswordValid = await bcrypt.compare(password, foundUser.password_hash);
     if (!isPasswordValid) {
