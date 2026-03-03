@@ -28,6 +28,17 @@ class UserRepository {
     return result.rows[0];
   }
 
+  async findByEmail(email: string): Promise<User | undefined> {
+    const query = UserQueries.findByEmail || 'SELECT * FROM "user" WHERE email = $1';
+    const result = await db.query<User>(query, [email]);
+    return result.rows[0];
+  }
+
+  async updatePassword(id: number, passwordHash: string): Promise<void> {
+    const query = UserQueries.updatePassword || 'UPDATE "user" SET password_hash = $1 WHERE id = $2';
+    await db.query(query, [passwordHash, id]);
+  }
+
   async update(id: number, userData: UpdateUserInput): Promise<User> {
     const result = await db.query<User>(UserQueries.update, [
       id,

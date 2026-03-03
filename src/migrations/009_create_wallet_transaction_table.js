@@ -4,7 +4,8 @@
  */
 exports.up = async function(knex) {
   // Create the 'wallet_transaction' table
-  // This is the immutable ledger tracking money going in and out. Never update or delete rows here.
+  // This is the immutable ledger tracking money going in and out. 
+  // We should never update or delete rows here.
   await knex.raw(`
     CREATE TABLE IF NOT EXISTS wallet_transaction (
       id SERIAL PRIMARY KEY,                                      

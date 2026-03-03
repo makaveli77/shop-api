@@ -103,10 +103,10 @@ const DepositController = {
     const signature = req.headers['stripe-signature'] as string;
     
     // Express needs raw body here. We configure this in app.ts or routes.
-    // For now, assume req.body is the raw buffer.
+    // For now, lets assume req.body is the raw buffer.
     try {
       await DepositService.handleStripeWebhook(req.body, signature);
-      // ALWAYS return a standard 200 OK immediately back to Stripe so they don't retry
+      // ALWAYS should return a standard 200 OK immediately back to Stripe so they don't retry
       res.status(200).send({ received: true });
     } catch (error) {
       console.error('Webhook processing failed:', error);
@@ -143,7 +143,7 @@ const DepositController = {
         return;
       }
 
-      // We call the same safe Row-Lock DB function the Webhook would use!
+      // Call the same safe Row-Lock DB function the Webhook would use!
       // This is safe because completeDeposit() enforces it ONLY runs once if status is 'pending'
       const updatedRequest = await DepositRepository.completeDeposit(depositRequestId);
 

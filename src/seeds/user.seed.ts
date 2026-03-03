@@ -24,7 +24,7 @@ const seedUsers = async (db: any, count: number = 10): Promise<void> => {
     const ip_address = faker.internet.ipv4();
 
     try {
-      // 1. Create User
+      // Create User
       const userResult = await db.query(UserQueries.create, [
         username, email, passwordHash, firstName, lastName,
         address, phone_number, date_of_birth, city, country_code, ip_address
@@ -32,14 +32,14 @@ const seedUsers = async (db: any, count: number = 10): Promise<void> => {
       
       const userId = userResult.rows[0].id;
       
-      // 2. Create Wallet with random balance ($50.00 to $1000.00)
+      // Create Wallet with random balance ($50.00 to $1000.00)
       const initialBalance = faker.finance.amount({ min: 50, max: 1000, dec: 2 });
       await db.query(WalletQueries.create, [userId, initialBalance, 'USD']);
       
       const walletIdResult = await db.query(WalletQueries.findByUserId, [userId]);
       const walletId = walletIdResult.rows[0].id;
       
-      // 3. Create initial wallet transaction for the deposit
+      // Create initial wallet transaction for the deposit
       await db.query(WalletQueries.createTransaction, [walletId, 'deposit', initialBalance, 'Initial promotional deposit']);
       
       seededCount++;
@@ -48,7 +48,7 @@ const seedUsers = async (db: any, count: number = 10): Promise<void> => {
     }
   }
   
-  // Also ensure the 'admin' user created by migrations has a wallet
+  // Also make sure the 'admin' user created by migrations has a wallet
   try {
     const adminUser = await db.query(UserQueries.findByUsername, ['admin']);
     if (adminUser.rows.length > 0) {

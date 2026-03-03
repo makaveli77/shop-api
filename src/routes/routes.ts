@@ -24,6 +24,8 @@ const router: Router = express.Router();
 router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 router.get('/test', (_req: Request, res: Response) => res.json({ status: 'success', message: 'API Online' }));
 router.post('/login', AuthController.login);
+router.post('/forgot-password', AuthController.forgotPassword);
+router.post('/reset-password', AuthController.resetPassword);
 router.post('/register', validate(registerSchema), UserController.register);
 
 // Stripe Webhook (MUST be public so Stripe can reach it, secured by signatures)

@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_mock', {
 
 const DepositService = {
   async initiateDeposit(userId: number, amount: number) {
-    // 1. Get User's Wallet ID
+    // Get User's Wallet ID
     const walletRes = await db.query(WalletQueries.findByUserId, [userId]);
     const wallet = walletRes.rows[0];
     
@@ -17,10 +17,10 @@ const DepositService = {
       throw new Error('Wallet not found for user');
     }
 
-    // 2. Create Pending Deposit Request in our database
+    // Create Pending Deposit Request in our database
     const depositRequest = await DepositRepository.createRequest(userId, wallet.id, amount, 'USD', 'stripe');
 
-    // 3. Contact Stripe to create a PaymentIntent
+    // Contact Stripe to create a PaymentIntent
     // Stripe expects amount in cents for USD ($50.00 = 5000)
     const amountInCents = Math.round(amount * 100);
 
@@ -33,10 +33,10 @@ const DepositService = {
       },
     });
 
-    // 4. Update the DB with Stripe's uniquely generated transaction ID 
+    // Update the DB with Stripe's uniquely generated transaction ID 
     await DepositRepository.updateProviderTxId(depositRequest.id, paymentIntent.id);
 
-    // 5. Return the client_secret to the frontend so they can securely complete the physical payment on their browser
+    // Return the client_secret to the frontend so they can securely complete the physical payment on their browser
     return {
       client_secret: paymentIntent.client_secret,
       deposit_request_id: depositRequest.id
@@ -46,7 +46,7 @@ const DepositService = {
   async withdraw(userId: number, amount: number) {
     if (amount <= 0) throw new Error('Amount must be greater than 0');
 
-    // 1. Get User's Wallet ID
+    // Get User's Wallet ID
     const walletRes = await db.query(WalletQueries.findByUserId, [userId]);
     const wallet = walletRes.rows[0];
     
@@ -159,7 +159,7 @@ const DepositService = {
         break;
 
       default:
-        // We ignore event types we don't care about
+        // Ignore event types we don't care about
         console.log(`Unhandled event type ${event.type}`);
     }
 

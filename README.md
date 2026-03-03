@@ -19,6 +19,7 @@ Full TypeScript: Complete type safety with strict mode, barrel exports (`src/typ
 Layered Architecture: Clean separation of concerns for maximum scalability.
 ACID Transactions: Immutable e-wallet ledgers and reliable checkout operations using PostgreSQL 'FOR UPDATE' row-locking to prevent race conditions.
 JWT Authentication: Stateless security using JSON Web Tokens.
+Password Reset: Stateless, secure email-based reset flow using signed JWT tokens (invalidated on password change).
 Soft Deletes: Data preservation using a deleted_at pattern.
 Advanced Search & Filtering: Dynamic queries supporting partial text search, sorting, and pagination.
 
@@ -275,6 +276,32 @@ curl -X GET http://localhost:3000/articles \
 |--------|------------|---------------------------------------------|--------|
 | POST   | /login     | Exchange credentials for a JWT Bearer Token | Public |
 | POST   | /register  | Register a new user (supports extensive profile info e.g. `address`, `phone_number`, `date_of_birth`, etc.) | Public |
+| POST   | /forgot-password | Request a 15-min password reset link (Email) | Public |
+| POST   | /reset-password | Reset password using the token received in email | Public |
+
+
+### 📧 Email Configuration & Local Testing
+
+The project uses `nodemailer` for email services (currently for Password Resets).
+
+**1. Development / Testing (Default)**
+By default, if no email credentials are provided in `.env`, the system uses **Ethereal Email** (a fake SMTP service).
+- When you request a password reset, check your **terminal/console logs**.
+- You will see a `Preview URL`. Click it to view the "sent" email in your browser.
+- No setup required!
+
+**2. Production / Real Emails**
+To send real emails (e.g., via Gmail, SendGrid, Outlook), update your `.env` file:
+
+```env
+# Example for Gmail (Requires App Password if 2FA is on)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-16-char-app-password
+EMAIL_SECURE=false
+FRONTEND_URL=http://your-frontend-url.com
+```
 
 
 ### 📦 Product Management

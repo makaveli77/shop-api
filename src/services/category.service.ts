@@ -1,4 +1,3 @@
-// Service for Category
 import CategoryRepository from '../repositories/category.repository';
 import CacheService from './cache.service';
 import { Category } from '../types';

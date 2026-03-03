@@ -5,10 +5,12 @@
 
 interface UserQueriesType {
   findByEmailOrUsername: string;
+  findByEmail: string;
   findByUsername: string;
   findById: string;
   create: string;
   updateLastLogin: string;
+  updatePassword: string;
   update: string;
   lock: string;
   getStats: string;
@@ -17,6 +19,9 @@ interface UserQueriesType {
 const UserQueries: UserQueriesType = {
   // Find user by email or username
   findByEmailOrUsername: `SELECT * FROM "user" WHERE email = $1 OR username = $2`,
+
+  // Find user by email
+  findByEmail: `SELECT * FROM "user" WHERE email = $1`,
 
   // Find user by username
   findByUsername: `SELECT * FROM "user" WHERE username = $1`,
@@ -32,6 +37,9 @@ const UserQueries: UserQueriesType = {
 
   // Update last login
   updateLastLogin: `UPDATE "user" SET last_login = NOW() WHERE id = $1`,
+
+  // Update password
+  updatePassword: `UPDATE "user" SET password_hash = $1 WHERE id = $2`,
 
   // Update user details
   update: `

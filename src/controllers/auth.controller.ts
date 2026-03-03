@@ -61,6 +61,76 @@ const AuthController = {
     } catch (err) {
       next(err);
     }
+  },
+
+  /**
+   * @swagger
+   * /forgot-password:
+   *   post:
+   *     summary: Request a password reset email
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required: [email]
+   *             properties:
+   *               email:
+   *                 type: string
+   *                 format: email
+   *     responses:
+   *       200:
+   *         description: Reset email sent (if user exists)
+   */
+  async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email } = req.body;
+      if (!email) throw new Error('Email is required');
+      
+      await AuthService.forgotPassword(email);
+      res.json({ message: 'If that email exists, a password reset link has been sent.' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * @swagger
+   * /reset-password:
+   *   post:
+   *     summary: Reset password using token
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required: [token, newPassword]
+   *             properties:
+   *               token:
+   *                 type: string
+   *               newPassword:
+   *                 type: string
+   *                 format: password
+   *     responses:
+   *       200:
+   *         description: Password reset successful
+   *       400:
+   *         description: Invalid or expired token
+   */
+  async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { token, newPassword } = req.body;
+      if (!token || !newPassword) throw new Error('Token and newPassword are required');
+
+      await AuthService.resetPassword(token, newPassword);
+      res.json({ message: 'Password has been reset successfully.' });
+    } catch (err) {
+      next(err);
+    }
   }
 };
 

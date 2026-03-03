@@ -3,14 +3,14 @@
  * @returns { Promise<void> }
  */
 exports.up = async function(knex) {
-  // 1. Add columns to article table
+  // Add columns to article table
   await knex.raw(`
     ALTER TABLE article 
     ADD COLUMN discounted BOOLEAN DEFAULT FALSE NOT NULL,
     ADD COLUMN expires_at TIMESTAMP NULL;
   `);
 
-  // 2. Create article_discount table
+  // Create article_discount table
   await knex.raw(`
     CREATE TABLE article_discount (
       id SERIAL PRIMARY KEY,
@@ -24,7 +24,7 @@ exports.up = async function(knex) {
     );
   `);
 
-  // 3. Indexes for performance
+  // Indexes for performance
   await knex.raw(`CREATE INDEX idx_article_discount_article_id ON article_discount(article_id);`);
   await knex.raw(`CREATE INDEX idx_article_discount_supplier_id ON article_discount(supplier_id);`);
   await knex.raw(`CREATE INDEX idx_article_discount_category_id ON article_discount(category_id);`);

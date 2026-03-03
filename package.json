@@ -20,6 +20,7 @@
   },
   "type": "commonjs",
   "dependencies": {
+    "@types/nodemailer": "^7.0.11",
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
     "cors": "^2.8.6",
@@ -31,6 +32,7 @@
     "knex": "^3.1.0",
     "multer": "^2.0.2",
     "node-cache": "^5.1.2",
+    "nodemailer": "^8.0.1",
     "pg": "^8.11.0",
     "stripe": "^20.4.0",
     "swagger-jsdoc": "^6.2.8",

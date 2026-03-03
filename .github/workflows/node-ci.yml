@@ -21,33 +21,42 @@ jobs:
         node-version: [18, 20]
 
     steps:
+      # Check out the repository code so the runner can access it
       - uses: actions/checkout@v4
 
+      # Set up the Node.js environment based on the matrix versions
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
+      # Install dependencies cleanly (using package-lock.json)
       - name: Install dependencies
         run: npm ci
 
+      # Check for code style issues (if lint script exists)
       - name: Lint
         run: npm run lint --if-present
 
+      # Verify TypeScript types (if typecheck script exists)
       - name: Typecheck
         run: npm run typecheck --if-present
 
+      # Run the test suite with a dummy secret
       - name: Run tests
         run: npm test
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET || 'test_secret_for_ci' }}
 
+      # Attempt to build the project to ensure compilation works
       - name: Build
         run: npm run build --if-present
 
   deploy_staging:
+    # Trigger only if it's a PUSH event to the 'staging' branch
     if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    # Ensure tests pass before deploying
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -62,13 +71,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Execute the custom deployment script defined in package.json
       - name: Deploy to staging
         run: npm run deploy:staging --if-present
         env:
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
 
   deploy_production:
+    # Trigger only if it's a PUSH event to the 'main' branch
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Ensure tests pass before deploying
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -83,6 +95,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Execute the custom deployment script defined in package.json
       - name: Deploy to production
         run: npm run deploy:production --if-present
         env:
