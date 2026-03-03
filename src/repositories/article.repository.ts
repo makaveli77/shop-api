@@ -32,14 +32,14 @@ const ArticleRepository = {
       const value = (filters as any)[key];
       if (value === undefined || value === null || value === '') return;
       
-      // Special handling for expires_at to fetch articles expiring before or on the given date
+      // Handling expires_at to fetch articles expiring before or on the given date
       if (key === 'expires_at') {
         values.push(value);
         filterClauses.push(`a.expires_at <= $${values.length}`);
         return;
       }
       
-      // Special handling for tags to check array overlap
+      // Handling tags to check array overlap
       if (key === 'tags') {
         const tagsArr = Array.isArray(value) ? value : [value];
         values.push(tagsArr);

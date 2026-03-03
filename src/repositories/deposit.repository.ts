@@ -24,7 +24,7 @@ const DepositRepository = {
     try {
       await client.query('BEGIN');
 
-      // 1. Lock the deposit request
+      // Lock the deposit request
       const reqRes = await client.query(DepositQueries.getDepositRequestForUpdate, [depositRequestId]);
       const depositRequest = reqRes.rows[0];
 
@@ -33,7 +33,7 @@ const DepositRepository = {
          return null; // Doesn't exist or already processed
       }
 
-      // 2. Lock the wallet
+      // Lock the wallet
       const walletRes = await client.query(DepositQueries.getWalletForUpdate, [depositRequest.wallet_id]);
       const wallet = walletRes.rows[0];
 
@@ -42,14 +42,14 @@ const DepositRepository = {
          throw new Error('Wallet not found');
       }
 
-      // 3. Mark deposit as completed
+      // Mark deposit as completed
       await client.query(DepositQueries.markDepositCompleted, [depositRequestId]);
 
-      // 4. Update the wallet balance
+      // Update the wallet balance
       const newBalance = parseFloat(wallet.balance) + parseFloat(depositRequest.amount);
       await client.query(DepositQueries.updateWalletBalance, [newBalance, wallet.id]);
 
-      // 5. Insert into wallet_transaction ledger
+      // Insert into wallet_transaction ledger
       await client.query(DepositQueries.insertWalletTransaction, [wallet.id, depositRequest.amount, depositRequest.id, 'Stripe Deposit']);
 
       await client.query('COMMIT');

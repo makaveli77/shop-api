@@ -4,7 +4,7 @@ import SeedQueries from '../queries/seed.queries';
 const seedOrdersAndDeposits = async (db: any): Promise<void> => {
   console.log('🌱 Seeding Deposits and Orders...');
 
-  // 1. Get all users and wallets
+  // Get all users and wallets
   const walletsRes = await db.query(SeedQueries.getAllWallets);
   const wallets = walletsRes.rows as any[];
 
@@ -20,7 +20,7 @@ const seedOrdersAndDeposits = async (db: any): Promise<void> => {
     await db.query(SeedQueries.insertWalletTransactionWithoutRef, [wallet.id, 'deposit', 1000000, 'Seeding Top-up for Order Tests']);
   }
 
-  // 2. Generate Deposits (100 total: mix of completed, pending, failed)
+  // Generate Deposits (100 total: mix of completed, pending, failed)
   const depositStatuses = [
     ...Array(50).fill('completed'),
     ...Array(25).fill('pending'),
@@ -44,7 +44,7 @@ const seedOrdersAndDeposits = async (db: any): Promise<void> => {
   }
   console.log('✅ 100 deposits seeded');
 
-  // 3. Get all articles to pick from
+  // Get all articles to pick from
   const articlesRes = await db.query(SeedQueries.getAllArticlesIdsAndPrices);
   const articles = articlesRes.rows as any[];
 
@@ -53,7 +53,7 @@ const seedOrdersAndDeposits = async (db: any): Promise<void> => {
     return;
   }
 
-  // 4. Generate Orders (700 completed, 300 failed, 200 pending = 1200 total)
+  // Generate Orders (700 completed, 300 failed, 200 pending = 1200 total)
   const orderConfigs = [
     ...Array(700).fill('completed'),
     ...Array(300).fill('failed'),
@@ -90,13 +90,13 @@ const seedOrdersAndDeposits = async (db: any): Promise<void> => {
     
     // Follow the real repository logic flow:
     if (status === 'completed') {
-      // 1. Deduct wallet
+      // Deduct wallet
       await db.query(SeedQueries.deductWallet, [totalAmount, wallet.id]);
       
-      // 2. Add purchase trail to immutable ledger
+      // Add purchase trail to immutable ledger
       await db.query(SeedQueries.insertWalletTransactionWithRef, [wallet.id, 'purchase', -totalAmount, orderId, `Order #${orderId} (Seeded)`]);
       
-      // 3. Deduct stock from articles to mimic physical inventory moving
+      // Deduct stock from articles to mimic physical inventory moving
       for (const item of orderItems) {
         await db.query(SeedQueries.deductArticleStock, [item.quantity, item.article_id]);
       }

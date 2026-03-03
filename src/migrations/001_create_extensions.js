@@ -5,6 +5,6 @@ exports.up = async function(knex) {
 
 exports.down = async function(knex) {
   // Cannot drop extension in transaction if it's still in use
-  // In production, handle this manually
+  // In production, this should be handled manually
   // await knex.raw('DROP EXTENSION IF NOT EXISTS pg_trgm CASCADE');
 };

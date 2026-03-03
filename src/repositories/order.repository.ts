@@ -22,7 +22,7 @@ class OrderRepository {
     try {
       await client.query('BEGIN');
 
-      // 1. Get Wallet and lock it
+      // Get Wallet and lock it
       const walletRes = await client.query(OrderQueries.getWalletForUpdate, [userId]);
       if (walletRes.rows.length === 0) {
         throw this.createError('Wallet not found for user', 404);
@@ -33,7 +33,7 @@ class OrderRepository {
       const processedItems: ProcessedOrderItem[] = [];
       const affectedSuppliers = new Set<number>();
 
-      // 2. Process each item: lock article, check stock, calculate subtotal
+      // Process each item: lock article, check stock, calculate subtotal
       for (const item of items) {
         const articleRes = await client.query(OrderQueries.getArticleForUpdate, [item.article_id]);
         
@@ -64,16 +64,16 @@ class OrderRepository {
         affectedSuppliers.add(article.supplier_id);
       }
 
-      // 3. Check Wallet Balance
+      // Check Wallet Balance
       if (Number(wallet.balance) < totalAmount) {
         throw this.createError(`Insufficient wallet balance. Total: \${totalAmount}, Balance: \${wallet.balance}`, 400);
       }
 
-      // 4. Create the Order
+      // Create the Order
       const orderRes = await client.query<Order>(OrderQueries.createOrder, [userId, totalAmount, 'USD', 'completed']);
       const newOrder = orderRes.rows[0];
 
-      // 5. Deduct Wallet Balance & Create Transaction
+      // Deduct Wallet Balance & Create Transaction
       await client.query(OrderQueries.deductWalletBalance, [totalAmount, wallet.id]);
       
       await client.query(WalletQueries.createTransaction, [
