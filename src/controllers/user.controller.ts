@@ -73,9 +73,49 @@ const UserController = {
       const payload = { ...req.body, ip_address: req.ip };
       const user = await UserService.register(payload);
       res.status(201).json({
-        message: "User registered successfully",
+        message: "User registered successfully. Please check your email to verify your account.",
         user
       });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * @swagger
+   * /auth/verify:
+   *   get:
+   *     summary: Verify user email address
+   *     tags: [Auth]
+   *     parameters:
+   *       - in: query
+   *         name: token
+   *         required: true
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Email verified successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *       400:
+   *         description: Invalid or expired token
+   */
+  async verify(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { token } = req.query;
+      if (!token) {
+        res.status(400).json({ message: 'Verification token is required' });
+        return;
+      }
+      
+      const result = await UserService.verifyEmail(token as string);
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }

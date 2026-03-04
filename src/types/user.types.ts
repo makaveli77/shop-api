@@ -12,6 +12,7 @@ export interface User {
   country_code?: string;
   ip_address?: string;
   is_locked: boolean;
+  is_verified?: boolean;
   registration_date: Date;
   last_login?: Date | null;
 }

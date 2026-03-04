@@ -26,6 +26,7 @@ router.get('/test', (_req: Request, res: Response) => res.json({ status: 'succes
 router.post('/login', AuthController.login);
 router.post('/forgot-password', AuthController.forgotPassword);
 router.post('/reset-password', AuthController.resetPassword);
+router.get('/auth/verify', UserController.verify);
 router.post('/register', validate(registerSchema), UserController.register);
 
 // Stripe Webhook (MUST be public so Stripe can reach it, secured by signatures)

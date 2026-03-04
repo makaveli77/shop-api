@@ -46,7 +46,7 @@ const AuthController = {
    *       401:
    *         description: Invalid credentials
    *       403:
-   *         description: Account is locked
+   *         description: Account is locked or not verified
    *         content:
    *           application/json:
    *             schema:

@@ -22,6 +22,11 @@ class UserRepository {
     const result = await db.query<User>(UserQueries.findByEmailOrUsername, [email, username]);
     return result.rows[0];
   }
+  
+  async verifyEmail(id: number): Promise<User | undefined> {
+        const result = await db.query<User>(UserQueries.verifyEmail, [id]);
+        return result.rows[0];
+  }
 
   async findById(id: number): Promise<User | undefined> {
     const result = await db.query<User>(UserQueries.findById, [id]);

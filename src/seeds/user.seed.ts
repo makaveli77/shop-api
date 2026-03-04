@@ -31,6 +31,9 @@ const seedUsers = async (db: any, count: number = 10): Promise<void> => {
       ]);
       
       const userId = userResult.rows[0].id;
+
+      // Manually set seeded users as verified
+      await db.query(`UPDATE "user" SET is_verified = TRUE WHERE id = $1`, [userId]);
       
       // Create Wallet with random balance ($50.00 to $1000.00)
       const initialBalance = faker.finance.amount({ min: 50, max: 1000, dec: 2 });
@@ -60,7 +63,7 @@ const seedUsers = async (db: any, count: number = 10): Promise<void> => {
       if (adminWalletExist.rows.length === 0) {
         await db.query(WalletQueries.create, [adminId, 9999.99, 'USD']);
         const newWalletCheck = await db.query(WalletQueries.findByUserId, [adminId]);
-        await db.query(WalletQueries.createTransaction, [newWalletCheck.rows[0].id, 'deposit', 9999.99, 'Admin God Mode Funds']);
+        await db.query(WalletQueries.createTransaction, [newWalletCheck.rows[0].id, 'deposit', 9999.99, 0, 'Admin God Mode Funds']);
       }
     }
   } catch (err) {

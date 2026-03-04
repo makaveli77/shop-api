@@ -29,6 +29,12 @@ const AuthService = {
       throw error;
     }
 
+    if (!foundUser.is_verified) {
+      const error: CustomError = new Error('Account is not verified. Please check your email.');
+      error.status = 403;
+      throw error;
+    }
+
     // Compare password
     const isPasswordValid = await bcrypt.compare(password, foundUser.password_hash);
     if (!isPasswordValid) {

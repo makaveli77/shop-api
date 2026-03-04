@@ -15,7 +15,8 @@ class UserDTO {
       country_code: user.country_code,
       registration_date: user.registration_date,
       last_login: user.last_login,
-      is_locked: user.is_locked
+      is_locked: user.is_locked,
+      is_verified: user.is_verified
     };
   }
 }

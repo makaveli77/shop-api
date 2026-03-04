@@ -47,7 +47,7 @@ describe('User API - POST /register', () => {
     expect(res.body.user.last_name).toBe('User');
     expect(res.body.user).toHaveProperty('registration_date');
     expect(res.body.user).toHaveProperty('last_login');
-    expect(res.body).toHaveProperty('message', 'User registered successfully');
+    expect(res.body).toHaveProperty('message', 'User registered successfully. Please check your email to verify your account.');
   });
 
   it('should return 409 if username or email already exists', async () => {

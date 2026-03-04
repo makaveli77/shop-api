@@ -1,7 +1,9 @@
 import userRepository from '../repositories/user.repository';
 import UserDTO from '../dtos/user.dto';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { CreateUserInput, UpdateUserInput, UserStats } from '../types';
+import { sendVerificationEmail } from './mail.service';
 
 interface CustomError extends Error {
   status?: number;
@@ -26,7 +28,44 @@ const UserService = {
       username, email, password_hash, first_name, last_name,
       address, phone_number, date_of_birth, city, country_code, ip_address
     });
+
+    // Generate Verification Token (JWT)
+    const secret = process.env.JWT_SECRET || 'secret';
+    const verification_token = jwt.sign(
+      { id: newUser.id, email: newUser.email },
+      secret,
+      { expiresIn: '24h' }
+    );
+
+    // Send Verification Email
+    await sendVerificationEmail(email, verification_token);
+
     return UserDTO.toResponse(newUser);
+  },
+
+  async verifyEmail(token: string) {
+    try {
+      const secret = process.env.JWT_SECRET || 'secret';
+      const decoded = jwt.verify(token, secret) as { id: number, email: string };
+      
+      const user = await userRepository.findById(decoded.id);
+      if (!user) {
+        const error: CustomError = new Error('User not found');
+        error.status = 404;
+        throw error;
+      }
+
+      if (user.is_verified) {
+        return { message: 'Email already verified' };
+      }
+
+      await userRepository.verifyEmail(user.id);
+      return { message: 'Email verified successfully' };
+    } catch (err) {
+      const error: CustomError = new Error('Invalid or expired verification token');
+      error.status = 400;
+      throw error;
+    }
   },
 
   async updateLastLogin(userId: number): Promise<void> {

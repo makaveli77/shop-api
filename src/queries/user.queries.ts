@@ -14,6 +14,7 @@ interface UserQueriesType {
   update: string;
   lock: string;
   getStats: string;
+  verifyEmail: string;
 }
 
 const UserQueries: UserQueriesType = {
@@ -33,7 +34,10 @@ const UserQueries: UserQueriesType = {
   create: `
     INSERT INTO "user" (username, email, password_hash, first_name, last_name, address, phone_number, date_of_birth, city, country_code, ip_address)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-    RETURNING id, username, email, first_name, last_name, address, phone_number, date_of_birth, city, country_code, ip_address, registration_date, last_login, is_locked`,
+    RETURNING id, username, email, first_name, last_name, address, phone_number, date_of_birth, city, country_code, ip_address, registration_date, last_login, is_locked, is_verified`,
+
+  // Verify email
+  verifyEmail: `UPDATE "user" SET is_verified = TRUE WHERE id = $1 RETURNING *`,
 
   // Update last login
   updateLastLogin: `UPDATE "user" SET last_login = NOW() WHERE id = $1`,

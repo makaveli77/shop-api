@@ -29,7 +29,9 @@ describe('Auth API - POST /login', () => {
         first_name: 'Admin',
         last_name: 'User',
         registration_date: new Date().toISOString(),
-        last_login: null
+        last_login: null,
+        is_verified: true,
+        is_locked: false
       }],
       command: '',
       rowCount: 1,
@@ -58,7 +60,9 @@ describe('Auth API - POST /login', () => {
         first_name: 'Admin',
         last_name: 'User',
         registration_date: new Date().toISOString(),
-        last_login: null
+        last_login: null,
+        is_verified: true,
+        is_locked: false
       }],
       command: '',
       rowCount: 1,

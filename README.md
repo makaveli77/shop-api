@@ -19,6 +19,7 @@ Full TypeScript: Complete type safety with strict mode, barrel exports (`src/typ
 Layered Architecture: Clean separation of concerns for maximum scalability.
 ACID Transactions: Immutable e-wallet ledgers and reliable checkout operations using PostgreSQL 'FOR UPDATE' row-locking to prevent race conditions.
 JWT Authentication: Stateless security using JSON Web Tokens.
+Email Verification: Secure user registration with email confirmation flow using JWT.
 Password Reset: Stateless, secure email-based reset flow using signed JWT tokens (invalidated on password change).
 Soft Deletes: Data preservation using a deleted_at pattern.
 Advanced Search & Filtering: Dynamic queries supporting partial text search, sorting, and pagination.
@@ -118,7 +119,7 @@ Instead of a monolithic init.sql, this project uses **Knex.js migrations** for s
  `001_create_extensions.js` - Enable PostgreSQL extensions (pg_trgm for fuzzy search)
  `002_create_category_table.js` - Create category table + index on name
  `003_create_supplier_table.js` - Create supplier table + indexes (city, company_name, coordinates, created_at)
- `004_create_user_table.js` - Create user table + seed admin user + index on created_at (username: admin, password: password123)
+ `004_create_user_table.js` - Create user table + `is_verified` column + seed admin user + index on created_at (username: admin, password: password123)
  `005_create_article_table.js` - Create article table + comprehensive article indexes
  `006_create_article_discounts.js` - Add discount columns to article table and create article_discount table
  `007_create_article_category_table.js` - Create article_category many-to-many join table
@@ -195,7 +196,7 @@ All tables include strategic indexes created during migration for query optimiza
 *User Table (in 004):*
 - `idx_user_registration_date` - Descending index for sorting by registration date
 - (username and email already have unique indexes from constraints)
-- Columns: id, username, email, password_hash, first_name, last_name, registration_date, last_login
+- Columns: id, username, email, password_hash, first_name, last_name, registration_date, last_login, is_locked, is_verified
 
 *Wallets & Deposits (in 008, 009, 012):*
 - `idx_wallet_user_id` - Foreign key lookup to match wallets to users
@@ -272,9 +273,11 @@ curl -X POST http://localhost:3000/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"password123"}'
 
-# On successful login, the user's `last_login` field is updated to the current timestamp.
-# Response:
+# Response (Success):
 # {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
+
+# Response (Unverified):
+# {"status": "error", "message": "Account is not verified. Please check your email."}
 ```
 
 **Using JWT Token**
@@ -285,19 +288,20 @@ curl -X GET http://localhost:3000/articles \
 
 | Method | Endpoint   | Description                                 | Auth   |
 |--------|------------|---------------------------------------------|--------|
-| POST   | /login     | Exchange credentials for a JWT Bearer Token | Public |
-| POST   | /register  | Register a new user (supports extensive profile info e.g. `address`, `phone_number`, `date_of_birth`, etc.) | Public |
+| POST   | /login     | Exchange credentials for a JWT Bearer Token. Fails if email is not verified. | Public |
+| POST   | /register  | Register a new user. Sends a verification email. | Public |
+| GET    | /auth/verify | Verify newly registered user email via token | Public |
 | POST   | /forgot-password | Request a 15-min password reset link (Email) | Public |
 | POST   | /reset-password | Reset password using the token received in email | Public |
 
 
 ### 📧 Email Configuration & Local Testing
 
-The project uses `nodemailer` for email services (currently for Password Resets).
+The project uses `nodemailer` for email services (Password Resets & Email Verification).
 
 **1. Development / Testing (Default)**
 By default, if no email credentials are provided in `.env`, the system uses **Ethereal Email** (a fake SMTP service).
-- When you request a password reset, check your **terminal/console logs**.
+- When you register or request a password reset, check your **terminal/console logs**.
 - You will see a `Preview URL`. Click it to view the "sent" email in your browser.
 - No setup required!
 
@@ -311,7 +315,9 @@ EMAIL_PORT=587
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-16-char-app-password
 EMAIL_SECURE=false
-FRONTEND_URL=http://your-frontend-url.com
+
+# Frontend URL for Verification/Reset Links
+FRONTEND_URL=http://localhost:3000
 ```
 
 

@@ -16,15 +16,16 @@ exports.up = async function(knex) {
       ip_address VARCHAR(45),
       registration_date TIMESTAMP DEFAULT NOW(),
       last_login TIMESTAMP DEFAULT NULL,
-      is_locked BOOLEAN DEFAULT FALSE
+      is_locked BOOLEAN DEFAULT FALSE,
+      is_verified BOOLEAN DEFAULT FALSE
     )
   `);
   
   // Seed admin user for testing
   // Username: admin, Password: password123
   await knex.raw(`
-    INSERT INTO "user" (username, email, password_hash, first_name, last_name, registration_date, last_login)
-      VALUES ('admin', 'admin@example.com', '$2b$10$jISxvCdJkUsLwxKuzax8MOfLRH/gUJlZl9yPVzllJ8oP9zwaRY2/u', 'Admin', 'User', NOW(), NULL) ON CONFLICT DO NOTHING;
+    INSERT INTO "user" (username, email, password_hash, first_name, last_name, registration_date, last_login, is_verified)
+      VALUES ('admin', 'admin@example.com', '$2b$10$jISxvCdJkUsLwxKuzax8MOfLRH/gUJlZl9yPVzllJ8oP9zwaRY2/u', 'Admin', 'User', NOW(), NULL, TRUE) ON CONFLICT DO NOTHING;
   `);
   
   // User indexes for performance
